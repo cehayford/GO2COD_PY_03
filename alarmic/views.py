@@ -10,7 +10,7 @@ import pygame
 import os
 from django.http import JsonResponse
 
-# pygame.mixer.init()
+pygame.mixer.init()
 
 class AlarmSound:
     def __init__(self):
