@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Alarms{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 ">
+    <div class="flex flex-col items-center space-y-4">
+        <a href="{% url 'alarm-create' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            Add New Alarm
+        </a>
+    </div>
+
+    {% if alarms %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-6 py-3 text-left">Time</th>
+                        <th class="px-6 py-3 text-left">Description</th>
+                        <th class="px-6 py-3 text-left">Sound</th>
+                        <th class="px-6 py-3 text-left">Status</th>
+                        <th class="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alarm in alarms %}
+                    <tr class="border-t">
+                        <td class="px-6 py-4">{{ alarm.time|time:"H:i" }}</td>
+                        <td class="px-6 py-4">{{ alarm.description }}</td>
+                        <td class="px-6 py-4">
+                            {{ alarm.sound }}
+                            <button onclick="testSound('{{ alarm.sound }}')" 
+                                    class="ml-2 text-blue-500 hover:text-blue-700">
+                                Test
+                            </button>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded {% if alarm.is_active %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ alarm.is_active|yesno:"Active,Inactive" }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <form action="{% url 'alarm-toggle' alarm.pk %}" method="POST" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" 
+                                        class="text-blue-500 hover:text-blue-700">
+                                    {{ alarm.is_active|yesno:"Deactivate,Activate" }}
+                                </button>
+                            </form>
+                            <a href="{% url 'alarm-update' alarm.pk %}" 
+                               class="text-blue-500 hover:text-blue-700">
+                                Edit
+                            </a>
+                            <a href="{% url 'alarm-delete' alarm.pk %}" 
+                               class="text-red-500 hover:text-red-700">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-gray-500 text-center py-8">No alarms set. Create your first alarm!</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function testSound(soundFile) {
+    fetch(`/test-sound/${soundFile}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'error') {
+                alert('Error playing sound: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error testing sound');
+        });
+}
+</script>
+{% endblock %}

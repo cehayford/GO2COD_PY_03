@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Alarm{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 max-w-lg mx-auto">
+    <h2 class="text-xl font-semibold mb-6">Delete Alarm</h2>
+    
+    <p class="mb-6 text-gray-600">
+        Are you sure you want to delete the alarm set for {{ alarm.time|time:"H:i" }}
+        {% if alarm.description %}({{ alarm.description }}){% endif %}?
+    </p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="flex justify-end space-x-3">
+            <a href="{% url 'alarm-list' %}" 
+               class="bg-gray-100 text-gray-700 px-4 py-2 rounded hover:bg-gray-200">
+                Cancel
+            </a>
+            <button type="submit" 
+                    class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                Delete
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
