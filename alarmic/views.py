@@ -6,7 +6,7 @@ from .forms import AlarmForm
 import threading
 import time
 from datetime import datetime
-import pygame
+import playsound
 import os
 from django.http import JsonResponse
 
@@ -16,20 +16,23 @@ class AlarmSound:
     def __init__(self):
         self.is_playing = False
     
-    def play_sound(self, sound_file):
-        if not self.is_playing:
-            self.is_playing = True
-            try:
-                pygame.mixer.music.load(sound_file)
-                pygame.mixer.music.play(loops=3)
-                while pygame.mixer.music.get_busy():
-                    pygame.time.Clock().tick(10)
-            except Exception as e:
-                print(f"Error playing sound: {e}")
-            finally:
-                self.is_playing = False
+def play_sound(self, sound_file):
+    if not self.is_playing:
+        self.is_playing = True
+        try:
+            sound_path = os.path.join('alarm', 'alarm_sounds', sound_file)
+            if not os.path.exists(sound_path):
+                raise FileNotFoundError(f"Sound file not found: {sound_path}")
+            for _ in range(3):
+                playsound(sound_path)
+                time.sleep(0.1)
+        except Exception as e:
+            print(f"Error playing sound: {e}")
+        finally:
+            self.is_playing = False
 
 alarm_sound = AlarmSound()
+# alarm_sound.play_sound('your_sound_file.mp3')
 
 def check_alarms():
     while True:
